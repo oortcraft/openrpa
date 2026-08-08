@@ -2215,6 +2215,10 @@ namespace OpenRPA
                             {
                                 if (dp.IsAutoHidden) { dp.ToggleAutoHide(); }
                             }
+                            if (dp.ContentId == "Output")
+                            {
+                                if (dp.IsAutoHidden) { dp.ToggleAutoHide(); }
+                            }
                         }
                     }
 

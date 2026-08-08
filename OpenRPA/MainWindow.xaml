@@ -16,7 +16,8 @@
         KeyUp="Window_KeyUp"
         Title="OpenRPA"
         x:Uid="title"
-         Height="750" Width="1200">
+         Height="750" Width="1200"
+         FontSize="14">
 
     <Window.Resources>
         <local:BindingProxy x:Key="proxy" Data="{Binding}" />
@@ -24,9 +25,9 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition  Height="120" />
+            <RowDefinition  Height="Auto" />
             <RowDefinition />
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Ribbon DockPanel.Dock="Top" Margin="0,-22,0,0" Grid.Row="0" PreviewMouseWheel="SearchBox_PreviewMouseWheel" x:Name="MainRibbon">
             <Ribbon.ApplicationMenu>
@@ -310,11 +311,11 @@
         <avalonDock:DockingManager Grid.Row="1" x:Name="DManager" ActiveContentChanged="DManager_ActiveContentChanged">
             <avalonDock:DockingManager.Theme>
                 <!--<avalonDock:AeroTheme/>-->
-                <avalonDock:VS2010Theme/>
+                <!--<avalonDock:VS2010Theme/>-->
                 <!--<avalonDock:ExpressionDarkTheme/>-->
                 <!--<avalonDock:ExpressionLightTheme/>-->
                 <!--<avalonDock:GenericTheme/>-->
-                <!--<avalonDock:MetroTheme/>-->
+                <avalonDock:MetroTheme/>
             </avalonDock:DockingManager.Theme>
             <avalonDock:DockingManager.LayoutItemContainerStyle>
                 <Style TargetType="{x:Type dockctrl:LayoutItem}" >
@@ -325,6 +326,7 @@
                 </Style>
             </avalonDock:DockingManager.LayoutItemContainerStyle>
             <avalonDock:LayoutRoot>
+                <avalonDock:LayoutPanel Orientation="Vertical">
                 <avalonDock:LayoutPanel Orientation="Horizontal">
                     <avalonDock:LayoutAnchorablePaneGroup  DockWidth="270" Orientation="Horizontal" >
                         <avalonDock:LayoutAnchorablePane>
@@ -354,6 +356,22 @@
                                 </avalonDock:LayoutAnchorable>
                             </avalonDock:LayoutAnchorablePane>
                     </avalonDock:LayoutAnchorablePaneGroup>
+
+                </avalonDock:LayoutPanel>
+
+                <avalonDock:LayoutAnchorablePaneGroup DockHeight="180">
+                    <avalonDock:LayoutAnchorablePane>
+                        <avalonDock:LayoutAnchorable
+                                             CanClose="False" CanAutoHide="True" CanHide="False"  x:Name="Output" Title="{x:Static or:strings.dock_output}" ContentId="Output" >
+                            <DockPanel>
+                                <StackPanel HorizontalAlignment="Left">
+                                    <Button DockPanel.Dock="Top" Height="20" Width="20" Click="clearOutputMessages_Click" >X</Button>
+                                </StackPanel>
+                                <TextBox Text="{Binding Tracing.OutputMessages}" TextWrapping="Wrap" IsReadOnly="False" Margin="0,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                            </DockPanel>
+                        </avalonDock:LayoutAnchorable>
+                    </avalonDock:LayoutAnchorablePane>
+                </avalonDock:LayoutAnchorablePaneGroup>
 
                 </avalonDock:LayoutPanel>
 
@@ -387,16 +405,6 @@
                                 </avalonDock:LayoutAnchorable>
 
                                 <avalonDock:LayoutAnchorable
-                                                     CanClose="False" CanAutoHide="True" CanHide="False"  x:Name="Output" Title="{x:Static or:strings.dock_output}" ContentId="Output" >
-                                    <DockPanel>
-                                        <StackPanel HorizontalAlignment="Left">
-                                            <Button DockPanel.Dock="Top" Height="20" Width="20" Click="clearOutputMessages_Click" >X</Button>
-                                        </StackPanel>
-                                        <TextBox Text="{Binding Tracing.OutputMessages}" TextWrapping="Wrap" IsReadOnly="False" Margin="0,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-                                    </DockPanel>
-                                </avalonDock:LayoutAnchorable>
-
-                                <avalonDock:LayoutAnchorable
                                                      CanClose="False" CanAutoHide="True" CanHide="False"  x:Name="WorkflowInstances" Title="{x:Static or:strings.dock_workflowinstances}" 
                                                          ContentId="WorkflowInstances" >
                                     <views:WorkflowInstances Workflow="{Binding CurrentWorkflow, diag:PresentationTraceSources.TraceLevel=High, 
@@ -409,7 +417,7 @@
         </avalonDock:DockingManager>
 
 
-        <StatusBar HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="2" Height="25" Background="Gray">
+        <StatusBar HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="2" Background="Gray">
             <StatusBar FocusManager.IsFocusScope="True" x:Name="StatusBar">
                 <StatusBarItem>
                     <Image
