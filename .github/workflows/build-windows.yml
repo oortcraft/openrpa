@@ -1,0 +1,39 @@
+name: build-windows
+
+# Builds the app on a Windows runner and publishes dist/ as an artifact, so the
+# machine that runs OpenRPA does not need Visual Studio, NuGet access, or admin
+# rights. Every project in the solution outputs to the shared ..\dist folder in
+# Release, so that one folder is the runnable app.
+
+on:
+  push:
+    branches: [ "ui/**" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - uses: nuget/setup-nuget@v2
+
+      # Two projects (OpenRPA.RDService, OpenRPA.IE) still use packages.config,
+      # which msbuild -t:Restore does not cover.
+      - name: Restore packages
+        run: nuget restore OpenRPA.sln
+
+      # The WiX installer project has no Build.0 entry for Release|Any CPU, so
+      # it is skipped without needing to be excluded here.
+      - name: Build
+        run: msbuild OpenRPA.sln -p:Configuration=Release -p:Platform="Any CPU" -m -v:minimal
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: openrpa-dist
+          path: dist/
+          if-no-files-found: error
