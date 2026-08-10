@@ -48,8 +48,14 @@ jobs:
 
       # The WiX installer project has no Build.0 entry for Release|Any CPU, so
       # it is skipped without needing to be excluded here.
+      #
+      # GeneratePackageOnBuild is forced off because some projects run an
+      # AfterTargets="Pack" step that pushes the resulting package to nuget.org
+      # and to a local C:\nuget folder. That is the upstream author's release
+      # plumbing; here it only fails the build. A global property overrides the
+      # value set inside each project, so the source stays untouched.
       - name: Build
-        run: msbuild OpenRPA.sln -p:Configuration=Release -p:Platform="Any CPU" -m -v:minimal
+        run: msbuild OpenRPA.sln -p:Configuration=Release -p:Platform="Any CPU" -p:GeneratePackageOnBuild=false -m -v:minimal
 
       - name: Upload dist
         uses: actions/upload-artifact@v4
