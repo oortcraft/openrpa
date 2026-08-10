@@ -1,42 +1,30 @@
-# Windows 빌드 절차 (ui/modernize-step0)
+# Windows에서 실행하기
 
-이 소스는 `open-rpa/openrpa`의 하드포크다. UI 현대화 1차 변경 3건이 들어 있고,
-아직 **한 번도 빌드된 적이 없다.** 이 문서의 목적은 빌드를 성공시키는 것이다.
+이 소스는 `open-rpa/openrpa`의 하드포크다. 빌드는 GitHub Actions의 Windows 러너가
+대신 하므로, **실행하는 PC에는 Visual Studio도 NuGet 접근도 관리자 권한도 필요 없다.**
+받아서 실행만 하면 된다.
 
-## 0. 사전 확인 — 여기서 막히면 나머지는 의미 없다
+## 1. 빌드 결과물 받기
 
-**(1) NuGet 접근**
-
-브라우저에서 다음 주소를 연다.
+GitHub에 접근 가능한 기계(Mac)에서:
 
 ```
-https://api.nuget.org/v3/index.json
+https://github.com/oortcraft/openrpa/actions
 ```
 
-JSON 텍스트가 보이면 통과. 차단 페이지가 뜨면 **이 PC에서는 빌드할 수 없다.**
-프로젝트 42개가 NuGet 패키지 33개를 직접 참조하고, 그중 Roslyn(`Microsoft.CodeAnalysis.*`)과
-`Emgu.CV`의 전이 의존성이 수백 개다. 오프라인 번들링은 현실적이지 않다.
+가장 최근의 성공한 `build-windows` 실행을 열고 아래쪽 **Artifacts**에서
+`openrpa-dist`를 내려받는다 (약 109MB). 그걸 Google Drive에 올려 Windows에서 받는다.
 
-**(2) 관리자 권한**
+## 2. 실행
 
-VS2022 설치와 구성요소 추가에 필요하다. 없으면 (1)이 통과해도 막힌다.
+압축을 풀면 **`net462\`** 하위 폴더가 있고 그 안에 `OpenRPA.exe`가 있다.
+(SDK 형식 프로젝트가 출력 경로 뒤에 타겟 프레임워크를 붙인다.)
 
-## 1. Visual Studio 2022
+```
+net462\OpenRPA.exe
+```
 
-Visual Studio Installer에서:
-
-- **워크로드**: `.NET 데스크톱 개발`
-- **개별 구성 요소**에서 검색해 추가:
-  - `Windows Workflow Foundation` — **기본 선택이 아니다.** 없으면
-    `System.Activities.Presentation` 참조가 깨지고 WF 디자이너가 빌드되지 않는다
-  - `.NET Framework 4.6.2 타게팅 팩`
-
-## 2. 빌드
-
-1. `OpenRPA.sln` 열기
-2. 솔루션 탐색기에서 `OpenRPA` 프로젝트 → 우클릭 → **시작 프로젝트로 설정**
-3. 첫 빌드 전 **복원**이 끝날 때까지 기다린다 (패키지가 많아 수 분 걸린다)
-4. 빌드 → 실행
+.NET Framework 4.8은 Windows 10/11에 기본 포함이라 런타임을 따로 깔 필요는 없다.
 
 ## 3. `layout.config` 삭제 — 안 하면 Output 변경이 안 보인다
 
@@ -53,6 +41,9 @@ XAML에 정의된 레이아웃을 **통째로 대체한다.** 기존에 OpenRPA�
 ```
 %APPDATA%\OpenRPA\layout.config
 ```
+
+설정과 워크플로는 이 폴더를 기존 설치본(MSI)과 공유한다. 기존 워크플로가 그대로
+보이는 건 그래서다.
 
 ## 4. 이번 변경 내용
 
@@ -80,10 +71,26 @@ Metro / Aero / VS2010 셋뿐이고, 그중 가장 평평하다. `Vs2013LightThem
 5. **WF 캔버스 글씨도 커졌는지** — 상속되면 같이 커진다. 의도한 변경은 아니다.
    커진 게 나으면 두고, 아니면 캔버스 쪽만 되돌린다
 
-## 6. 빌드 실패 시
+**스크린샷을 찍어 둔다.** 다음 결정(리본을 걷어내고 사이드바로 갈지)의 유일한 근거다.
 
-에러 전문을 그대로 복사해 둔다. 특히 아래는 원인이 정해져 있다.
+## 부록 — CI가 하는 일
 
-- `System.Activities.Presentation`을 찾을 수 없음 → 1번의 Windows Workflow Foundation 미설치
-- 패키지 복원 실패 → 0번(1)의 NuGet 차단
-- `net462` 타게팅 팩 없음 → 1번의 타게팅 팩 미설치
+`.github/workflows/build-windows.yml`. `ui/**` 브랜치에 push하면 돈다.
+빌드를 세우기까지 걸렸던 것들:
+
+- `LiteDB`, `Open3270`, `vb5250`가 서브모듈이라 `submodules: recursive`가 필요했다
+- `OpenRPA.Interfaces` / `OpenRPA.Net` / `OpenRPA.WorkItems.Activities`가 `net46`을
+  노리는데 러너에 4.6 타게팅 팩이 없었다. `Microsoft.NETFramework.ReferenceAssemblies`는
+  WPF가 XAML 컴파일용으로 만드는 `*_wpftmp.csproj` 임시 프로젝트에서 참조 경로가
+  유실돼 소용없었고, `net462`로 리타게팅해 해결했다
+- `OpenRPA.SAP` / `OpenRPA.SAPBridge`는 SAP GUI가 깔린 기계에만 있는 COM interop을
+  요구한다. 워크플로가 빌드 직전 솔루션에서 제거한다
+- 일부 프로젝트가 빌드 후 `nuget.exe push`로 nuget.org에 배포를 시도한다. 업스트림
+  작성자의 배포 설비다. `-p:GeneratePackageOnBuild=false`로 끈다
+
+## 부록 — 로컬에서 직접 빌드하려면
+
+CI를 쓰면 필요 없지만, Windows에서 직접 빌드하려면 VS2022에 워크로드
+`.NET 데스크톱 개발`과 개별 구성 요소 `Windows Workflow Foundation`(기본 선택이 아니다),
+그리고 `.NET Framework 4.6.2 타게팅 팩`이 있어야 한다. NuGet 복원을 위해
+`https://api.nuget.org/v3/index.json` 접근도 필요하다.

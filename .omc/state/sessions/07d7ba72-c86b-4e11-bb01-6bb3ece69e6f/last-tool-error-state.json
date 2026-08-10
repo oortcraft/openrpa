@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"echo \\\"=== Google Drive 로컬 동기화 폴더 ===\\\"\\nls -d ~/Library/CloudStorage/* 2>/dev/null\\nls -d ~/\\\"Google Drive\\\" 2>/dev/null\\necho; echo \\\"=== dotnet CLI ===\\\"\\nwhich dotnet && dotnet --versi...",
-  "error": "Exit code 1\n=== Google Drive 로컬 동기화 폴더 ===\n(eval):2: no matches found: /Users/junseok-kang/Library/CloudStorage/*\n\n=== dotnet CLI ===\ndotnet not found\n\n=== nuget/msbuild ===\nnuget not found\nmsbuild not found\nmono not found",
-  "timestamp": "2026-08-08T07:57:23.497Z",
+  "tool_input_preview": "{\"command\":\"cd /private/tmp/claude-501/-Users-junseok-kang-ax-dev/07d7ba72-c86b-4e11-bb01-6bb3ece69e6f/scratchpad\\nrm -rf dist-check && mkdir dist-check && cd dist-check\\ngh run download 31345246125 -...",
+  "error": "Exit code 143\nCommand timed out after 5m 0s",
+  "timestamp": "2026-08-10T00:52:26.754Z",
   "retry_count": 1
 }
