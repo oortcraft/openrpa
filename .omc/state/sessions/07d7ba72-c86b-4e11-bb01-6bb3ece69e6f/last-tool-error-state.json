@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"echo \\\"=== Google Drive 로컬 동기화 폴더 ===\\\"\\nls -d ~/Library/CloudStorage/* 2>/dev/null\\nls -d ~/\\\"Google Drive\\\" 2>/dev/null\\necho; echo \\\"=== dotnet CLI ===\\\"\\nwhich dotnet && dotnet --versi...",
+  "error": "Exit code 1\n=== Google Drive 로컬 동기화 폴더 ===\n(eval):2: no matches found: /Users/junseok-kang/Library/CloudStorage/*\n\n=== dotnet CLI ===\ndotnet not found\n\n=== nuget/msbuild ===\nnuget not found\nmsbuild not found\nmono not found",
+  "timestamp": "2026-08-08T07:57:23.497Z",
+  "retry_count": 1
+}

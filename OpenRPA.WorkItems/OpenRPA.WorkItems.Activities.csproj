@@ -232,6 +232,9 @@
   <Target Name="AddNugetPackage" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="nuget.exe add $(OutputPath)..\$(PackageId).$(PackageVersion).nupkg -Source C:\nuget" />
     <Exec Command="nuget.exe push $(OutputPath)..\$(PackageId).$(PackageVersion).nupkg -skipDuplicate -Source nuget.org" />
-  
+
   </Target>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

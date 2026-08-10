@@ -15,11 +15,31 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # LiteDB, Open3270 and vb5250 are submodules; without them msbuild fails
+      # with MSB3202 on the missing project files.
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - uses: microsoft/setup-msbuild@v2
 
       - uses: nuget/setup-nuget@v2
+
+      # OpenRPA.SAP and OpenRPA.SAPBridge bind to SAP GUI COM interop assemblies
+      # that only exist on a machine with SAP GUI installed, so they can never
+      # build here. Drop them from the solution for this build only.
+      - name: Drop SAP projects from the solution
+        shell: pwsh
+        run: |
+          $sln = Get-Content OpenRPA.sln -Raw
+          foreach ($name in 'OpenRPA.SAP', 'OpenRPA.SAPBridge') {
+            $pattern = '(?ms)^Project\([^)]*\) = "' + [regex]::Escape($name) + '",.*?^EndProject\r?\n'
+            $sln = [regex]::Replace($sln, $pattern, '')
+          }
+          Set-Content OpenRPA.sln -Value $sln -NoNewline
+          if (Select-String -Path OpenRPA.sln -Pattern 'OpenRPA\.SAP' -Quiet) {
+            throw "SAP projects still present in the solution"
+          }
 
       # Two projects (OpenRPA.RDService, OpenRPA.IE) still use packages.config,
       # which msbuild -t:Restore does not cover.
